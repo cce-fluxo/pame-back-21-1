@@ -1,40 +1,84 @@
+from flask import  request, jsonify
+from flask.views import MethodView
 from app.alunos.model import Aluno
-from flask import request, Blueprint, jsonify
 from app.extensions import db
+from flask_jwt_extended import create_access_token
 
-aluno_api = Blueprint('aluno_api',__name__)
+class AlunosCreate(MethodView):      # /aluno/create
+    def get(self):
+        aluno = Aluno.query.all()
+        return jsonify([aluno.json() for aluno in aluno]),200
 
-@aluno_api.route('/alunos',methods=['POST'])
-def criar_aluno():
-    if request.method == 'POST':
-        dados = request.json
+    def post(self):
+        dados = request.json        
         nome = dados.get('nome')
-        if not isinstance(nome,str):
-            return {'error':'tipo invalido'}
         dre = dados.get('dre')
-        aluno = Aluno(nome=nome,dre=dre)
+        senha = str(dados.get('senha'))
+
+        if Aluno.query.filter_by(dre = dre).first():
+            return{"error":"CPF já cadastrado"}
+        
+        aluno = Aluno(nome = nome, dre = dre, senha = senha)
+
         db.session.add(aluno)
         db.session.commit()
 
-        return aluno.json(),200
-    
-    if request.method == 'GET':
-        alunos = Aluno.query.all()
-        return jsonify([aluno.json() for aluno in alunos]),200
+        return aluno.json() , 200
 
-@aluno_api.route('/alunos/<int:id>',methods=['PATCH','GET','PUT','DELETE'])
-def pagina_aluno(id):
-    aluno = Aluno.query.get_or_404(id)
-    if request.method == 'GET':
+class AlunosDetails(MethodView):      # /aluno/details/<int:id>
+    def get(self,id):
+        aluno = Aluno.query.get_or_404(id)
         return aluno.json(),200
-    if request.method == 'PATCH':
+
+    def put(self,id):
+        aluno = Aluno.query.get_or_404(id)
+        dados = request.json             
+        nome = dados.get('nome')
+        dre = dados.get('dre')
+        senha = str(dados.get('senha'))
+        
+        aluno.nome = nome
+        aluno.dre = dre
+        aluno.senha = senha
+        
+        db.session.commit()
+        return aluno.json() , 200
+
+    def patch(self,id):
+        aluno = Aluno.query.get_or_404(id)
+        dados = request.json        
+
+        nome = dados.get('nome', aluno.nome)
+        dre = dados.get('dre', aluno.dre)
+        senha = dados.get('senha', aluno.senha)
+
+        aluno.nome = nome
+        aluno.dre = dre
+        aluno.senha = senha
+
+        db.session.commit()
+        return aluno.json() , 200
+
+    def delete(self,id):
+        aluno = Aluno.query.get_or_404(id)
+        db.session.delete(aluno)
+        db.session.commit()
+        return aluno.json(), 200
+
+class AlunoLogin(MethodView):   #/aluno/login
+    def post(self):
         dados = request.json
-    nome = dados.get('nome',aluno.nome)
-    dre = dados.get('dre',aluno.dre)
-    aluno.nome = nome
-    aluno.dre = dre
-    db.session.commit()
-    return aluno.json(),200
+        email = dados.get('email')
+        senha = str(dados.get('senha'))
+        
+        aluno = Aluno.query.filter_by(email=email).first()
+
+        if not aluno :
+            return {"error":"E-mail não cadastrado"}, 400
+
+        token = create_access_token(identity = aluno.id)
+
+        return {"token":token}, 200
 
 
 
