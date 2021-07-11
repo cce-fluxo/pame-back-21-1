@@ -1,6 +1,6 @@
 from flask import Flask
 from app.extensions import db
-from app.extensions import migrate
+from app.extensions import migrate, mail
 from app.config import Config
 from app.alunos.routes import aluno_api
 
@@ -10,6 +10,7 @@ def create_app():
     app.register_blueprint(aluno_api)
     db.init_app(app)
     migrate.init_app(app,db)
+    mail.init_app(app)
 
     app.register_blueprint(aluno_api)
     
