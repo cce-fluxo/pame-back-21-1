@@ -17,12 +17,11 @@ class AlunosCreate(MethodView):      #/aluno/create
         dados = request.json        
         nome = dados.get('nome')
         dre = dados.get('dre')
-        senha = str(dados.get('senha'))
 
         if Aluno.query.filter_by(dre = dre).first():
             return{"error":"CPF já cadastrado"}
         
-        aluno = Aluno(nome = nome, dre = dre, senha = senha)
+        aluno = Aluno(nome = nome, dre = dre)
 
         db.session.add(aluno)
         db.session.commit()
@@ -39,11 +38,9 @@ class AlunosDetails(MethodView):      #/aluno/details/<int:id>
         dados = request.json             
         nome = dados.get('nome')
         dre = dados.get('dre')
-        senha = str(dados.get('senha'))
         
         aluno.nome = nome
         aluno.dre = dre
-        aluno.senha = senha
         
         db.session.commit()
         return aluno.json() , 200
@@ -54,11 +51,9 @@ class AlunosDetails(MethodView):      #/aluno/details/<int:id>
 
         nome = dados.get('nome', aluno.nome)
         dre = dados.get('dre', aluno.dre)
-        senha = dados.get('senha', aluno.senha)
 
         aluno.nome = nome
         aluno.dre = dre
-        aluno.senha = senha
 
         db.session.commit()
         return aluno.json() , 200
@@ -68,21 +63,6 @@ class AlunosDetails(MethodView):      #/aluno/details/<int:id>
         db.session.delete(aluno)
         db.session.commit()
         return aluno.json(), 200
-
-class AlunoLogin(MethodView):   #/aluno/login
-    def post(self):
-        dados = request.json
-        email = dados.get('email')
-        senha = str(dados.get('senha'))
-        
-        aluno = Aluno.query.filter_by(email=email).first()
-
-        if not aluno :
-            return {"error":"E-mail não cadastrado"}, 400
-
-        token = create_access_token(identity = aluno.id)
-
-        return {"token":token}, 200
 
 
 

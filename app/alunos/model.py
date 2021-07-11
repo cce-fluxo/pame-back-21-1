@@ -7,7 +7,6 @@ class Aluno(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(20),nullable=False)
     dre = db.Column(db.Integer,nullable=False)
-    senha = db.Column(db.String(200), nullable = False)
 
     #turma = db.relationship("Turma", secondary=association_table, back_populates="aluno")
 
