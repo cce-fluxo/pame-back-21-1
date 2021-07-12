@@ -14,4 +14,4 @@ aluno_api.add_url_rule(
     '/aluno/details/<int:id>', view_func= AlunosDetails.as_view('aluno_details'), methods=['GET','PUT','PATCH','DELETE']
 )
 
-#view_func vem do MethidView 
+#view_func vem do MethidView// as_view-> a classe é instanciada com os parâmetros usados para a função as_view

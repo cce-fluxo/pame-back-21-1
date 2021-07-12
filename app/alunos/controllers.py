@@ -10,31 +10,31 @@ from flask_mail import Message
 
 class AlunosCreate(MethodView):      #/aluno/create
     def get(self):
-        aluno = Aluno.query.all()
-        return jsonify([aluno.json() for aluno in aluno]),200
+        aluno = Aluno.query.all()  #Pegar todos os alunos cadastrados na tabela com o método post
+        return jsonify([aluno.json() for aluno in aluno]),200 #Os dados são retornados pelo formato de json (dicionário)
 
     def post(self):
-        dados = request.json        
-        nome = dados.get('nome')
+        dados = request.json  #Pegar só o que tá vindo do json      
+        nome = dados.get('nome')  #Função do python para ler o json e pegar o comapo nome
         dre = dados.get('dre')
-        email=dados.get('email')
+        email= dados.get('email')
 
-        if Aluno.query.filter_by(dre = dre).first():
-            return{"error":"CPF já cadastrado"}
+        if not isinstance(nome, str) or not isinstance (dre, int) or not isinstance(email,str):
+            return {"error" : "Algum tipo invalido"}, 400
         
-        aluno = Aluno(nome = nome, dre = dre, email=email)
+        aluno = Aluno(nome = nome, dre = dre, email=email) #colocar aluno em uma variável e passar os atributos (cria o objeto aluno)
 
-        db.session.add(aluno)
-        db.session.commit()
+        db.session.add(aluno) #Abrindo uma seção no bd para adicionar um aluno
+        db.session.commit()   #Salva no bd
 
         msg = Message(sender='camilamaia@poli.ufrj.br', #quem vai enviar o email -> Depois devem ir no Send Atentication para configurar o email que pode aparecer no sender
                       recipients= [email],
                       subject= 'Bem-vindo!', 
                       html = render_template('email.html', nome=nome)) #Quem vai receber o email
-
         mail.send(msg)
 
-        return aluno.json() , 200
+        return aluno.json() , 200 #retornando para o front os valores que estão no model
+
 #SendGrid-> Email Api -> Integration Guide -> SMTP (Protocolo de comunicação por email)
 
 class AlunosDetails(MethodView):      #/aluno/details/<int:id>
