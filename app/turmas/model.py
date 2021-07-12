@@ -1,5 +1,5 @@
 from app.extensions import db
-from app.association import association_table
+#from app.association import association_table
 
 
 class Turma(db.Model):
@@ -10,5 +10,5 @@ class Turma(db.Model):
 
     materia_id = db.Column(db.Integer,db.ForeignKey('materia.id'))
 
-    alunos = db.relationship('Aluno',secondary=association_table,backref='turmas')
+    #alunos = db.relationship('Aluno',secondary=association_table,backref='turmas')
 
