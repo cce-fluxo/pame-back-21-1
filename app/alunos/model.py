@@ -12,8 +12,9 @@ class Aluno(db.Model):
     #turma = db.relationship("Turma", secondary=association_table, back_populates="aluno")
 
     def json(self):
-        {'nome':self.nome,
-         'dre': self.dre, 
-         'email': self.email
+        return {
+            'nome':self.nome,
+            'dre': self.dre, 
+            'email': self.email
         }
 

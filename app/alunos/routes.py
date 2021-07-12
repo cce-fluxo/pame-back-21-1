@@ -1,4 +1,4 @@
-from flask import Blueprint
+from flask import Blueprint #Registra a rota
 
 from app.alunos.controllers import AlunosCreate, AlunosDetails
 # 1 ponto- arquivos de dentro dessa pasta (.controllers)
